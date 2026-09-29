@@ -13,7 +13,7 @@
 
   <section id="login" class="screen active">
     <div class="login-card glass">
-      <div class="logo-wrap"><img src="/logo.png" alt="MIKAZI"></div>
+      <div class="logo-wrap"><div class="energy-ring"></div><img src="/logo.png" alt="MIKAZI"></div>
       <div class="eyebrow">PRIVATE INTELLIGENCE</div>
       <h1>MIKAZI</h1>
       <p>AI FOR A SMARTER TOMORROW</p>
@@ -36,7 +36,7 @@
 
     <section class="hero">
       <div class="hero-logo"><img src="/logo.png" alt="MIKAZI logo"></div>
-      <div class="badge">PRIVATE AI • SECURE ACCESS</div>
+      <div class="cyber-status"><span></span> SYSTEM ONLINE</div><div class="badge">PRIVATE AI • SECURE ACCESS</div>
       <h2>هوش مصنوعی، <span>به سبک MIKAZI</span></h2>
       <p>یک فضای خصوصی برای گفتگو، فکر کردن، ایده‌پردازی و گرفتن پاسخ‌های هوشمند.</p>
 
@@ -61,6 +61,13 @@
       <button id="clearChat" class="icon-btn" title="پاک کردن گفتگو">⌫</button>
     </header>
 
+    <div class="chat-tools">
+      <div class="chat-search">
+        <span>⌕</span>
+        <input id="chatSearch" type="search" placeholder="جستجو در گفتگو...">
+        <button id="clearSearch" type="button">×</button>
+      </div>
+    </div>
     <div id="messages" class="messages"></div>
 
     <div class="composer-wrap">
@@ -69,7 +76,7 @@
       </div>
       <form id="chatForm" class="composer">
         <textarea id="messageInput" rows="1" placeholder="پیامت رو برای MIKAZI بنویس..." autocomplete="off"></textarea>
-        <button id="sendBtn" type="submit" aria-label="ارسال">↑</button>
+        <button id="micBtn" type="button" aria-label="ضبط صدا">🎙️</button><button id="sendBtn" type="submit" aria-label="ارسال">↑</button>
       </form>
       <small class="notice">MIKAZI ممکن است مانند هر سیستم هوش مصنوعی گاهی پاسخ نادرست بدهد.</small>
     </div>
