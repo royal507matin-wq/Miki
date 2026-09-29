@@ -56,7 +56,7 @@ function readBody(req) {
     req.on("data", chunk => {
       data += chunk;
 
-      if (data.length > 2_000_000) {
+      if (data.length > 10_000_000) {
         reject(new Error("body too large"));
         req.destroy();
       }
@@ -138,6 +138,7 @@ const server = http.createServer(async (req, res) => {
         ? body.messages
         : [];
 
+      const memory = Array.isArray(body.memory) ? body.memory.filter(x => typeof x === "string").slice(0, 50) : [];
       const clean = messages
         .filter(
           m =>
@@ -156,7 +157,7 @@ const server = http.createServer(async (req, res) => {
         messages: [
           {
             role: "system",
-            content: "You are MIKAZI, a private AI assistant."
+            content: "You are MIKAZI, a private AI assistant. User memory: " + (memory.length ? memory.join(" | ") : "none") + "."
           },
           ...clean
         ]

@@ -56,14 +56,17 @@
 
   <section id="chat" class="chat-screen hidden">
     <header class="chat-header">
+      <button id="historyBtn" class="icon-btn" title="تاریخچه چت">☰</button>
       <button id="backHome" class="icon-btn">→</button>
       <div class="chat-brand"><img src="/logo.png" alt=""><div><b>MIKAZI</b><small>AI ASSISTANT • ONLINE</small></div></div>
-      <button id="clearChat" class="icon-btn" title="پاک کردن گفتگو">⌫</button>
+      <button id="memoryBtn" class="icon-btn" title="حافظه">🧠</button><button id="clearChat" class="icon-btn" title="پاک کردن گفتگو">⌫</button>
     </header>
 
     <div class="chat-tools">
       <div class="chat-search">
         <span>⌕</span>
+    <aside id="historyPanel" class="history-panel hidden"><div class="history-head"><b>تاریخچه گفتگو</b><button id="closeHistory" class="icon-btn">×</button></div><div id="historyList" class="history-list"></div><button id="newChatBtn" class="new-chat-btn">＋ گفتگوی جدید</button></aside>
+    <aside id="memoryPanel" class="memory-panel hidden"><div class="history-head"><b>حافظه MIKAZI</b><button id="closeMemory" class="icon-btn">×</button></div><div id="memoryList" class="history-list"></div><button id="addMemory" class="new-chat-btn">＋ افزودن حافظه</button></aside>
         <input id="chatSearch" type="search" placeholder="جستجو در گفتگو...">
         <button id="clearSearch" type="button">×</button>
       </div>

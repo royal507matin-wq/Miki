@@ -3,7 +3,7 @@ const login = $("#login"), home = $("#home"), chat = $("#chat");
 const password = $("#password"), loginBtn = $("#loginBtn"), loginError = $("#loginError");
 const messagesEl = $("#messages"), input = $("#messageInput"), sendBtn = $("#sendBtn");
 
-let messages = JSON.parse(localStorage.getItem("mikazi_chat") || "[]");
+let chats = JSON.parse(localStorage.getItem("mikazi_chats") || '{"main":{"title":"گفتگوی جدید","messages":[]}}'); let currentChat = "main"; let messages = chats[currentChat].messages;
 
 function spawnParticles(){
   const box = $("#particles");
@@ -33,7 +33,7 @@ function renderMessages(){
   messages.forEach(m=>{
     const row=document.createElement("div");
     row.className="message "+m.role;
-    row.innerHTML=`<div class="bubble">${escapeHtml(m.content)}</div>`;
+    row.innerHTML=`<div class="bubble">${m.role==="assistant" ? formatMarkdown(m.content) : escapeHtml(m.content)}</div>${m.role==="assistant" ? '<div class="message-actions"><button class="copy-btn" type="button">⧉</button><button class="regen-btn" type="button">↻</button></div>' : ''}`;
     messagesEl.appendChild(row);
   });
   messagesEl.scrollTop=messagesEl.scrollHeight;
@@ -41,7 +41,7 @@ function renderMessages(){
 function addMessage(role,content,animate=true){
   const row=document.createElement("div");
   row.className="message "+role;
-  row.innerHTML = `<div class="bubble">${escapeHtml(content)}</div>${role==="assistant" ? '<button class="copy-btn" type="button" aria-label="کپی پاسخ">⧉</button>' : ''}`;
+  row.innerHTML = `<div class="bubble">${role==="assistant" ? formatMarkdown(content) : escapeHtml(content)}</div>${role==="assistant" ? '<div class="message-actions"><button class="copy-btn" type="button" aria-label="کپی پاسخ">⧉</button><button class="regen-btn" type="button" aria-label="تولید دوباره">↻</button></div>' : ''}`;
   messagesEl.appendChild(row);
   messagesEl.scrollTop=messagesEl.scrollHeight;
 
@@ -50,7 +50,7 @@ function addMessage(role,content,animate=true){
     bubble.classList.add("answer-in");
   }
 }
-function save(){localStorage.setItem("mikazi_chat",JSON.stringify(messages));}
+function save(){chats[currentChat].messages=messages;localStorage.setItem("mikazi_chats",JSON.stringify(chats));}
 
 async function checkSession(){
   try{
@@ -106,6 +106,7 @@ input.addEventListener("keydown",e=>{
 $("#chatForm").addEventListener("submit",async e=>{
   e.preventDefault();
   const text=input.value.trim();
+  if(text && chats[currentChat] && chats[currentChat].title==="گفتگوی جدید"){chats[currentChat].title=text.slice(0,32);save();}
   if(!text||sendBtn.disabled)return;
   mikSound("send"); messages.push({role:"user",content:text});
   save();
@@ -237,4 +238,72 @@ sendBtn.addEventListener("click",()=>{
   if(!sendBtn.disabled && input.value.trim()){
     mikSound("send");
   }
+});
+
+const historyBtn=$("#historyBtn");
+const historyPanel=$("#historyPanel");
+const closeHistory=$("#closeHistory");
+const historyList=$("#historyList");
+const newChatBtn=$("#newChatBtn");
+
+function renderHistory(){
+  if(!historyList)return;
+  historyList.innerHTML="";
+  Object.entries(chats).forEach(([id,c])=>{
+    const item=document.createElement("button");
+    item.className="history-item";
+    item.innerHTML="<strong>"+escapeHtml(c.title||"گفتگوی جدید")+"</strong><small>"+c.messages.length+" پیام</small>";
+    item.onclick=()=>{
+      currentChat=id;
+      messages=chats[id].messages;
+      renderMessages();
+      historyPanel.classList.add("hidden");
+    };
+    historyList.appendChild(item);
+  });
+}
+
+historyBtn?.addEventListener("click",()=>{
+  renderHistory();
+  historyPanel.classList.remove("hidden");
+});
+
+closeHistory?.addEventListener("click",()=>{
+  historyPanel.classList.add("hidden");
+});
+
+newChatBtn?.addEventListener("click",()=>{
+  const id="chat_"+Date.now();
+  chats[id]={title:"گفتگوی جدید",messages:[]};
+  currentChat=id;
+  messages=chats[id].messages;
+  save();
+  renderMessages();
+  renderHistory();
+});
+
+function formatMarkdown(s){
+  return escapeHtml(s)
+    .replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>")
+    .replace(/`([^`]+)`/g,"<code>$1</code>")
+    .replace(/\n/g,"<br>");
+}
+
+document.addEventListener("click",async e=>{
+  const btn=e.target.closest(".regen-btn");
+  if(!btn)return;
+  const row=btn.closest(".message.assistant");
+  const all=[...messagesEl.querySelectorAll(".message.assistant")];
+  const n=all.indexOf(row);
+  const data=messages.filter(m=>m.role==="assistant")[n];
+  if(!data)return;
+  btn.disabled=true;
+  const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages.slice(0,messages.indexOf(data))})});
+  const d=await r.json();
+  if(d.reply){
+    data.content=d.reply;
+    save();
+    renderMessages();
+  }
+  btn.disabled=false;
 });
