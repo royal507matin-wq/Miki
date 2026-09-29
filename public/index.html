@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#030711">
+  <title>MIKAZI — AI FOR A SMARTER TOMORROW</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <div class="grid"></div><div id="particles"></div>
+
+  <section id="login" class="screen active">
+    <div class="login-card glass">
+      <div class="logo-wrap"><img src="/logo.png" alt="MIKAZI"></div>
+      <div class="eyebrow">PRIVATE INTELLIGENCE</div>
+      <h1>MIKAZI</h1>
+      <p>AI FOR A SMARTER TOMORROW</p>
+      <div class="line"></div>
+      <label for="password">رمز ورود</label>
+      <div class="password-row">
+        <input id="password" type="password" autocomplete="current-password" placeholder="رمز خصوصی MIKAZI">
+        <button id="togglePass" type="button" aria-label="نمایش رمز">◉</button>
+      </div>
+      <button id="loginBtn" class="primary-btn">ورود به MIKAZI <span>→</span></button>
+      <div id="loginError" class="error"></div>
+    </div>
+  </section>
+
+  <main id="home" class="hidden">
+    <nav class="nav">
+      <div class="brand"><img src="/logo.png" alt=""><span>MIKAZI</span></div>
+      <button id="logoutBtn" class="ghost-btn">خروج</button>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-logo"><img src="/logo.png" alt="MIKAZI logo"></div>
+      <div class="badge">PRIVATE AI • SECURE ACCESS</div>
+      <h2>هوش مصنوعی، <span>به سبک MIKAZI</span></h2>
+      <p>یک فضای خصوصی برای گفتگو، فکر کردن، ایده‌پردازی و گرفتن پاسخ‌های هوشمند.</p>
+
+      <div class="features">
+        <div class="feature glass"><b>01</b><strong>هوشمند</strong><small>پاسخ‌گویی قدرتمند با API</small></div>
+        <div class="feature glass"><b>02</b><strong>خصوصی</strong><small>ورود با رمز اختصاصی MIKAZI</small></div>
+        <div class="feature glass"><b>03</b><strong>همیشه آماده</strong><small>گفتگوها در دستگاه ذخیره می‌شوند</small></div>
+      </div>
+    </section>
+
+    <button id="startChat" class="start-chat">
+      <span class="pulse-dot"></span>
+      <span>شروع گفتگو</span>
+      <span class="arrow">↗</span>
+    </button>
+  </main>
+
+  <section id="chat" class="chat-screen hidden">
+    <header class="chat-header">
+      <button id="backHome" class="icon-btn">→</button>
+      <div class="chat-brand"><img src="/logo.png" alt=""><div><b>MIKAZI</b><small>AI ASSISTANT • ONLINE</small></div></div>
+      <button id="clearChat" class="icon-btn" title="پاک کردن گفتگو">⌫</button>
+    </header>
+
+    <div id="messages" class="messages"></div>
+
+    <div class="composer-wrap">
+      <div class="suggestions">
+        <button>یه ایده خفن بده</button><button>کمکم کن برنامه‌ریزی کنم</button><button>یه موضوع رو توضیح بده</button>
+      </div>
+      <form id="chatForm" class="composer">
+        <textarea id="messageInput" rows="1" placeholder="پیامت رو برای MIKAZI بنویس..." autocomplete="off"></textarea>
+        <button id="sendBtn" type="submit" aria-label="ارسال">↑</button>
+      </form>
+      <small class="notice">MIKAZI ممکن است مانند هر سیستم هوش مصنوعی گاهی پاسخ نادرست بدهد.</small>
+    </div>
+  </section>
+
+  <script src="/app.js"></script>
+</body>
+</html>
