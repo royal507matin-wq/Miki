@@ -139,6 +139,15 @@ const server = http.createServer(async (req, res) => {
         : [];
 
       const memory = Array.isArray(body.memory) ? body.memory.filter(x => typeof x === "string").slice(0, 50) : [];
+      const personality = typeof body.personality === "string" ? body.personality : "normal";
+      const personalityMap = {
+        normal: "پاسخ‌ها طبیعی و متعادل باشند.",
+        friendly: "لحن دوستانه، صمیمی و راحت داشته باش.",
+        professional: "لحن حرفه‌ای، دقیق و منظم داشته باش.",
+        creative: "لحن خلاق، ایده‌پرداز و جذاب داشته باش."
+      };
+      const personalityInstruction = personalityMap[personality] || personalityMap.normal;
+
       const clean = messages
         .filter(
           m =>
@@ -157,7 +166,7 @@ const server = http.createServer(async (req, res) => {
         messages: [
           {
             role: "system",
-            content: "You are MIKAZI, a private AI assistant. User memory: " + (memory.length ? memory.join(" | ") : "none") + "."
+              content: "You are MIKAZI, a private AI assistant. " + personalityInstruction + " User memory: " + (memory.length ? memory.join(" | ") : "none") + "."
           },
           ...clean
         ]

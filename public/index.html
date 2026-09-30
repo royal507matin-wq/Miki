@@ -31,7 +31,7 @@
   <main id="home" class="hidden">
     <nav class="nav">
       <div class="brand"><img src="/logo.png" alt=""><span>MIKAZI</span></div>
-      <button id="logoutBtn" class="ghost-btn">خروج</button>
+      <button id="settingsBtn" class="ghost-btn">⚙️ تنظیمات</button><button id="logoutBtn" class="ghost-btn">خروج</button>
     </nav>
 
     <section class="hero">
@@ -53,6 +53,21 @@
       <span class="arrow">↗</span>
     </button>
   </main>
+  <aside id="settingsPanel" class="settings-panel hidden">
+    <div class="settings-head"><b>⚙️ تنظیمات MIKAZI</b><button id="closeSettings" class="icon-btn">×</button></div>
+    <div class="settings-body">
+      <label>حالت پاسخ‌دهی</label>
+      <select id="personalitySelect">
+        <option value="normal">عادی</option>
+        <option value="friendly">دوستانه</option>
+        <option value="professional">حرفه‌ای</option>
+        <option value="creative">خلاق</option>
+      </select>
+      <label>حافظه</label>
+      <button id="memoryToggle" class="setting-btn">فعال</button>
+      <button id="clearHistorySettings" class="setting-btn danger">پاک کردن تاریخچه</button>
+    </div>
+  </aside>
 
   <section id="chat" class="chat-screen hidden">
     <header class="chat-header">
@@ -79,12 +94,13 @@
       </div>
       <form id="chatForm" class="composer">
         <textarea id="messageInput" rows="1" placeholder="پیامت رو برای MIKAZI بنویس..." autocomplete="off"></textarea>
-        <button id="micBtn" type="button" aria-label="ضبط صدا">🎙️</button><button id="sendBtn" type="submit" aria-label="ارسال">↑</button>
+        <button id="micBtn" type="button" aria-label="ضبط صدا">🎙️</button><button id="stopBtn" type="button" aria-label="توقف" hidden>■</button><button id="sendBtn" type="submit" aria-label="ارسال">↑</button>
       </form>
       <small class="notice">MIKAZI ممکن است مانند هر سیستم هوش مصنوعی گاهی پاسخ نادرست بدهد.</small>
     </div>
   </section>
 
+  <footer class="site-credit">© MIKAZI AI Team</footer>
   <script src="/app.js"></script>
 </body>
 </html>

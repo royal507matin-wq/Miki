@@ -2,6 +2,7 @@ const $ = s => document.querySelector(s);
 const login = $("#login"), home = $("#home"), chat = $("#chat");
 const password = $("#password"), loginBtn = $("#loginBtn"), loginError = $("#loginError");
 const messagesEl = $("#messages"), input = $("#messageInput"), sendBtn = $("#sendBtn");
+let chatController = null;
 
 let chats = JSON.parse(localStorage.getItem("mikazi_chats") || '{"main":{"title":"گفتگوی جدید","messages":[]}}'); let currentChat = "main"; let messages = chats[currentChat].messages;
 
@@ -73,6 +74,7 @@ async function loginNow(){
     if(!r.ok) throw new Error(d.error||"ورود ناموفق بود.");
     password.value="";
     show(home);
+      window.scrollTo(0,0); document.documentElement.scrollTop=0; document.body.scrollTop=0;
   }catch(e){loginError.textContent=e.message;}
   finally{loginBtn.disabled=false;}
 }
@@ -112,13 +114,13 @@ $("#chatForm").addEventListener("submit",async e=>{
   save();
   addMessage("user",text);
   input.value=""; input.style.height="auto";
-  sendBtn.disabled=true;
+  sendBtn.disabled=true; stopBtn.hidden=false;
   const typing=document.createElement("div");
   typing.className="message assistant";
   typing.innerHTML='<div class="bubble"><span class="typing"><i></i><i></i><i></i></span></div>';
   messagesEl.appendChild(typing); messagesEl.scrollTop=messagesEl.scrollHeight;
   try{
-    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages})});
+    chatController=new AbortController(); const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages,memory:mikMemory,personality:mikPersonality}),signal:chatController.signal});
     const d=await r.json();
     if(!r.ok) throw new Error(d.error||"خطا");
     typing.remove();
@@ -126,10 +128,10 @@ $("#chatForm").addEventListener("submit",async e=>{
     save();
     addMessage("assistant",d.reply);
     mikSound("receive");
-  }catch(err){
+  }catch(err){ if(err.name==="AbortError") return;
     typing.remove();
     addMessage("assistant","⚠️ "+err.message);
-  }finally{sendBtn.disabled=false;input.focus();}
+  }finally{sendBtn.disabled=false;stopBtn.hidden=true;chatController=null;input.focus();}
 });
 
 const chatSearch = $("#chatSearch");
@@ -298,7 +300,7 @@ document.addEventListener("click",async e=>{
   const data=messages.filter(m=>m.role==="assistant")[n];
   if(!data)return;
   btn.disabled=true;
-  const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages.slice(0,messages.indexOf(data))})});
+  chatController=new AbortController(); const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:messages.slice(0,messages.indexOf(data))})});
   const d=await r.json();
   if(d.reply){
     data.content=d.reply;
@@ -307,3 +309,102 @@ document.addEventListener("click",async e=>{
   }
   btn.disabled=false;
 });
+
+const memoryBtn=$("#memoryBtn");
+const memoryPanel=$("#memoryPanel");
+const closeMemory=$("#closeMemory");
+const memoryList=$("#memoryList");
+const addMemory=$("#addMemory");
+
+let mikMemory=JSON.parse(localStorage.getItem("mikazi_memory")||"[]");
+
+function saveMemory(){
+  localStorage.setItem("mikazi_memory",JSON.stringify(mikMemory));
+}
+
+function renderMemory(){
+  if(!memoryList)return;
+  memoryList.innerHTML="";
+  mikMemory.forEach((m,i)=>{
+    const item=document.createElement("div");
+    item.className="memory-item";
+
+    const span=document.createElement("span");
+    span.textContent=m;
+
+    const btn=document.createElement("button");
+    btn.type="button";
+    btn.textContent="حذف";
+    btn.onclick=()=>{
+      mikMemory.splice(i,1);
+      saveMemory();
+      renderMemory();
+    };
+
+    item.append(span,document.createElement("br"),btn);
+    memoryList.appendChild(item);
+  });
+}
+
+memoryBtn?.addEventListener("click",()=>{
+  renderMemory();
+  memoryPanel?.classList.remove("hidden");
+});
+
+closeMemory?.addEventListener("click",()=>{
+  memoryPanel?.classList.add("hidden");
+});
+
+addMemory?.addEventListener("click",()=>{
+  const v=prompt("چی رو می‌خوای MIKAZI به خاطر بسپره؟");
+  if(v?.trim()){
+    mikMemory.push(v.trim());
+    saveMemory();
+    renderMemory();
+  }
+});
+
+
+
+const stopBtn=$("#stopBtn");
+
+stopBtn?.addEventListener("click",()=>{
+  if(chatController){
+    chatController.abort();
+    chatController=null;
+  }
+
+  const typing=document.querySelector("#messages .message.assistant:last-child .typing");
+  if(typing){
+    typing.closest(".message")?.remove();
+  }
+
+  sendBtn.disabled=false;
+  stopBtn.hidden=true;
+  input.focus();
+});
+
+const settingsBtn=$("#settingsBtn");
+const settingsPanel=$("#settingsPanel");
+const closeSettings=$("#closeSettings");
+
+settingsBtn?.addEventListener("click",()=>{
+  settingsPanel?.classList.remove("hidden");
+});
+
+closeSettings?.addEventListener("click",()=>{
+  settingsPanel?.classList.add("hidden");
+});
+
+const personalitySelect=$("#personalitySelect");
+
+let mikPersonality=localStorage.getItem("mikazi_personality")||"normal";
+
+if(personalitySelect){
+  personalitySelect.value=mikPersonality;
+
+  personalitySelect.addEventListener("change",()=>{
+    mikPersonality=personalitySelect.value;
+    localStorage.setItem("mikazi_personality",mikPersonality);
+  });
+}
